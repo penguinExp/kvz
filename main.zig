@@ -40,6 +40,23 @@ pub fn main() !void {
 
         std.debug.print("{} connected\n", .{client_address});
 
+        const timeout = posix.timeval{ .tv_sec = 2, .tv_usec = 500_000 };
+
+        // read timeout
+        try posix.setsockopt(
+            socket,
+            posix.SOL.SOCKET,
+            posix.SO.RCVTIMEO,
+            &std.mem.toBytes(timeout),
+        );
+
+        // write timeout
+        try posix.setsockopt(
+            socket,
+            posix.SOL.SOCKET,
+            posix.SO.SNDTIMEO,
+            &std.mem.toBytes(timeout),
+        );
         const read = posix.read(socket, &buffer) catch |err| {
             std.debug.print("error reading: {}\n", .{err});
             continue;
